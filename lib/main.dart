@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
@@ -7,63 +8,73 @@ import 'package:pingMe/repository/repository.dart';
 import 'package:pingMe/bloc/message_states.dart';
 import 'package:flutter/foundation.dart';
 
-void main() async{
-  SimpleBlocObserver();
+import 'repository/repository.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer = SimpleBlocObserver();
   await Firebase.initializeApp();
-  Repository repository = Repository();
-  runApp(PingMe(repository));
+
+  final firestore = FirebaseFirestore.instance;
+
+  runApp(
+    RepositoryProvider(
+      create: (_) => Repository(firestore: firestore),
+      child: const PingMe(),
+    ),
+  );
 }
 
 class PingMe extends StatelessWidget {
+  const PingMe({Key key}) : super(key: key);
 
-  Repository repository;
-  PingMe( this.repository);
-  
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
       title: 'PingeMe',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MessagesScreen(repository:
-        repository,
-      ),
+      home: const MessagesScreen(),
     );
   }
 }
 
-class MessagesScreen extends StatefulWidget {
-  Repository repository;
-  MessagesScreen({@required repository})
-      : assert(repository != null);
+class MessagesScreen extends StatelessWidget {
+  const MessagesScreen({Key key}) : super(key: key);
 
   @override
-  _MessagesScreenState createState() => _MessagesScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider<MessageBloc>(
+      create: (_) => MessageBloc(
+        repository: context.repository<Repository>(),
+      ),
+      child: const Messages(),
+    );
+  }
 }
 
-class _MessagesScreenState extends State<MessagesScreen> {
-  MessageBloc _msgBloc;
+class Messages extends StatefulWidget {
+  const Messages({Key key}) : super(key: key);
 
   @override
-  void initState() {
-    _msgBloc = MessageBloc(repository: widget.repository);
-    // TODO: implement initState
-    super.initState();
+  _MessagesState createState() => _MessagesState();
+}
 
-    
+class _MessagesState extends State<Messages> {
+  final _textController = TextEditingController();
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController _textController = TextEditingController();
-
     return Scaffold(
-      
       appBar: AppBar(
         title: Text('PingMe'),
       ),
