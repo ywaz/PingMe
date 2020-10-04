@@ -1,0 +1,212 @@
+###################Repository######################
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pingMe/repository/message.dart';
+
+
+class Repository {
+
+  static const  collection = 'PingMeChats';
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> sendMessage(Message message, String receiverId) async {
+     await  _firestore.collection(collection).doc('${message.userId}-$receiverId').collection('chats').add({
+      'createdAt': Timestamp.now(),
+      'userId': message.userId,
+      'userName': message.userName,
+      'userImage': message.userImage,
+    });
+  }
+
+  Stream<QuerySnapshot> receiveMessage(String userId, String receiverId){
+    return _firestore.collection(collection).doc('$userId-$receiverId').collection('chats').snapshots();
+  } 
+
+  deleteMessage(Message message, String receiverId, String docId) {
+    _firestore.collection(collection).doc('${message.userId}-$receiverId').collection('chats').doc(docId).delete();
+  }
+
+
+}
+
+
+
+####################Message Event#####################
+
+import 'package:equatable/equatable.dart';
+import 'package:pingMe/repository/message.dart';
+import 'package:flutter/foundation.dart';
+
+abstract class MessageEvent extends Equatable {
+  const MessageEvent([List props = const []]);
+
+  @override
+  List<dynamic> get props => [];
+}
+
+class SendMessage extends MessageEvent {
+    final Message message;
+  final String receiverId;
+  SendMessage({@required this.message, @required this.receiverId})
+      : assert(message != null && message.text.isNotEmpty && receiverId!=null),
+        super([message, receiverId]);
+}
+
+class ReceiveMessage extends MessageEvent {
+  final String userId, receiverId;
+  ReceiveMessage({@required this.userId, @required this.receiverId}):assert(userId!=null && receiverId!=null),super([userId,receiverId]);
+}
+
+class DeleteMessage extends MessageEvent {}
+
+
+####################Message state#####################
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart' show required;
+import 'package:pingMe/repository/message.dart';
+
+abstract class MessageState extends Equatable {
+  const MessageState([List props = const []]);
+
+  @override
+  List<dynamic> get props => [];
+}
+
+class MessageUploaded extends MessageState {
+  final Message message;
+  final String receiverId;
+  MessageUploaded({@required this.message, @required this.receiverId})
+      : assert(message != null && message.text.isNotEmpty && receiverId!=null),
+        super([message, receiverId]);
+}
+
+class MessageLoading extends MessageState{}
+
+class MessageLoaded extends MessageState {
+  final List<dynamic> listMessages;
+  MessageLoaded({@required this.listMessages})
+      : assert(listMessages != null),
+        super([listMessages]);
+}
+
+class MessageDeleted extends MessageState{
+  final Message messageId;
+  final String receiverId;
+  final String docId;
+  MessageDeleted(
+      {@required this.messageId,
+      @required this.receiverId,
+      @required this.docId})
+      : assert(messageId != null && receiverId != null && docId != null),
+        super([messageId, receiverId, docId]);
+}
+class MessageError extends MessageState {}
+
+####################main#####################
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:pingMe/bloc/bloc.dart';
+import 'package:pingMe/bloc/simple_bloc_observer.dart';
+import 'package:pingMe/repository/repository.dart';
+import 'package:pingMe/bloc/message_states.dart';
+import 'package:flutter/foundation.dart';
+
+void main() async{
+  SimpleBlocObserver();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  Repository repository = Repository();
+  runApp(PingMe(repository));
+}
+
+class PingMe extends StatelessWidget {
+
+  Repository repository;
+  PingMe( this.repository);
+  
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    
+    return MaterialApp(
+      title: 'PingeMe',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: MessagesScreen(repository:
+        repository,
+      ),
+    );
+  }
+}
+
+class MessagesScreen extends StatefulWidget {
+  Repository repository;
+  MessagesScreen({@required repository})
+      : assert(repository != null);
+
+  @override
+  _MessagesScreenState createState() => _MessagesScreenState();
+}
+
+class _MessagesScreenState extends State<MessagesScreen> {
+  MessageBloc _msgBloc;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _msgBloc = MessageBloc(repository: widget.repository);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    TextEditingController _textController = TextEditingController();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('PingMe'),
+      ),
+      body: BlocBuilder<MessageBloc, MessageState>(
+          builder: (context, MessageState state) {
+        return Column(children: [
+          Flexible(
+            flex: 9,
+            child: (state is MessageLoaded)
+                ? ListView.builder(
+                    itemCount: state.listMessages.length,
+                    itemBuilder: (context, index) => Container(
+                        child: Text(state.listMessages[index]), width: 50),
+                  )
+                : CircularProgressIndicator(),
+          ),
+          Flexible(
+            flex: 1,
+            child: Container(
+              padding: const EdgeInsets.only(left: 10),
+              width: double.infinity,
+              height: 100,
+              child: Row(children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _textController,
+                    keyboardType: TextInputType.text,
+                    autofocus: true,
+                    decoration: InputDecoration(hintText: 'Ping'),
+                  ),
+                ),
+                IconButton(icon: Icon(Icons.send), onPressed: () {})
+              ]),
+            ),
+          )
+        ]);
+      }),
+    );
+  }
+}
