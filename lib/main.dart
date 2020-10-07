@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:pingMe/bloc/bloc.dart';
+import 'package:pingMe/bloc/message_events.dart';
 import 'package:pingMe/bloc/simple_bloc_observer.dart';
 import 'package:pingMe/repository/repository.dart';
 import 'package:pingMe/bloc/message_states.dart';
@@ -50,7 +51,7 @@ class MessagesScreen extends StatelessWidget {
     return BlocProvider<MessageBloc>(
       create: (_) => MessageBloc(
         repository: context.repository<Repository>(),
-      ),
+      )..add(ReceiveMessage(userId: '123456789', receiverId: '987654321')),
       child: const Messages(),
     );
   }
@@ -87,9 +88,9 @@ class _MessagesState extends State<Messages> {
                 ? ListView.builder(
                     itemCount: state.listMessages.length,
                     itemBuilder: (context, index) => Container(
-                        child: Text(state.listMessages[index]), width: 50),
+                        child: Text(state.listMessages[index].text), width: 50),
                   )
-                : CircularProgressIndicator(),
+                : Center(child:CircularProgressIndicator()),
           ),
           Flexible(
             flex: 1,

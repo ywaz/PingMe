@@ -24,12 +24,15 @@ class Repository {
     });
   }
 
-  Stream<QuerySnapshot> receiveMessage(String userId, String receiverId) {
+  Stream<List<Message>> receiveMessage() {
     return _firestore
-        .collection(collection)
-        .doc('$userId-$receiverId')
-        .collection('chats')
-        .snapshots();
+        .collection(collection).snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((documentSnapshot) {
+        print('extracted data is : ${documentSnapshot.data()}');
+        Message.fromSnapshot(documentSnapshot);
+      }).toList();
+    });
   }
 
   deleteMessage(Message message, String receiverId, String docId) {
