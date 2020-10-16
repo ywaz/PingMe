@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart' show required;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pingMe/bloc/message_events.dart';
 import 'package:pingMe/bloc/message_states.dart';
-import 'package:pingMe/repository/message.dart';
 import 'package:pingMe/repository/repository.dart';
 
 class MessageBloc extends Bloc<MessageEvent, MessageState> {
@@ -29,17 +28,24 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     }
 
     if (event is ReceiveMessage) {
+      
       try {
+        
+        print('fucking event is $event');
         _messagesStream = repository
             .receiveMessage()
             .listen((listOfMessages) {
-          add(MessageReceived(listOfMessage: [Message(text: 'toto',createdAt: DateTime.now(), userId:'toto',userName: 'toto' )]));
+          add(MessageReceived(listOfMessage: listOfMessages));
+          
         });
+        
       } catch (_) {
         yield MessageError();
       }
     } else if (event is MessageReceived) {
+      yield MessageLoading();
       yield MessageLoaded(listMessages: event.listOfMessage);
+
     }
   }
 
@@ -47,7 +53,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
 //override close method to cancel stream subscription
   @override
   Future<void> close() {
-
+      print('closing streamlistener');
     _messagesStream?.cancel();
     return super.close();
   }

@@ -24,6 +24,8 @@ void main() async {
       child: const PingMe(),
     ),
   );
+
+  // runApp(PingMe());
 }
 
 class PingMe extends StatelessWidget {
@@ -48,9 +50,11 @@ class MessagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
+    print('Bloc  Provider Builder ');
     return BlocProvider<MessageBloc>(
-      create: (_) => MessageBloc(
-        repository: context.repository<Repository>(),
+      create: (ctx) => MessageBloc(
+        repository: ctx.repository<Repository>(),
       )..add(ReceiveMessage(userId: '123456789', receiverId: '987654321')),
       child: const Messages(),
     );
@@ -80,7 +84,9 @@ class _MessagesState extends State<Messages> {
         title: Text('PingMe'),
       ),
       body: BlocBuilder<MessageBloc, MessageState>(
+        
           builder: (context, MessageState state) {
+            
         return Column(children: [
           Flexible(
             flex: 9,

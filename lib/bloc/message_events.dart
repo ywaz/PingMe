@@ -24,7 +24,7 @@ class ReceiveMessage extends MessageEvent {
 }
 
 class MessageReceived extends MessageEvent{
-  List<Message> listOfMessage;
+  final List<Message> listOfMessage;
   MessageReceived({@required this.listOfMessage}):assert(listOfMessage!=null),super([listOfMessage]);
 }
 

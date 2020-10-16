@@ -30,7 +30,7 @@ class Repository {
         .map((snapshot) {
       return snapshot.docs.map((documentSnapshot) {
         print('extracted data is : ${documentSnapshot.data()}');
-        Message.fromSnapshot(documentSnapshot);
+        return Message.fromSnapshot(documentSnapshot);
       }).toList();
     });
   }
