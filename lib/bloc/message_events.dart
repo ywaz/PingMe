@@ -12,15 +12,15 @@ abstract class MessageEvent extends Equatable {
 
 class SendMessage extends MessageEvent {
     final Message message;
-  final String receiverId;
-  SendMessage({@required this.message, @required this.receiverId})
-      : assert(message != null && message.text.isNotEmpty && receiverId!=null),
-        super([message, receiverId]);
+  final String conversationId;
+  SendMessage({@required this.message, @required this.conversationId})
+      : assert(message != null && message.text.isNotEmpty && conversationId!=null),
+        super([message, conversationId]);
 }
 
 class ReceiveMessage extends MessageEvent {
-  final String userId, receiverId;
-  ReceiveMessage({@required this.userId, @required this.receiverId}):assert(userId!=null && receiverId!=null),super([userId,receiverId]);
+  final String conversationId;
+  ReceiveMessage({@required this.conversationId}):assert(conversationId!=null),super([conversationId]);
 }
 
 class MessageReceived extends MessageEvent{

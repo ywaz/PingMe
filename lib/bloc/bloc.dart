@@ -17,43 +17,31 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   @override
   Stream<MessageState> mapEventToState(MessageEvent event) async* {
     if (event is SendMessage) {
-      yield MessageLoading();
       try {
-        await repository.sendMessage(event.message, event.receiverId);
-        yield MessageUploaded(
-            message: event.message, receiverId: event.receiverId);
+        await repository.sendMessage(event.message, event.conversationId);
       } catch (_) {
         yield MessageError();
       }
     }
 
     if (event is ReceiveMessage) {
-      
       try {
-        
-        print('fucking event is $event');
-        _messagesStream = repository
-            .receiveMessage()
-            .listen((listOfMessages) {
+        _messagesStream = repository.receiveMessage(event.conversationId).listen((listOfMessages) {
           add(MessageReceived(listOfMessage: listOfMessages));
-          
         });
-        
       } catch (_) {
         yield MessageError();
       }
     } else if (event is MessageReceived) {
       yield MessageLoading();
       yield MessageLoaded(listMessages: event.listOfMessage);
-
     }
   }
-
 
 //override close method to cancel stream subscription
   @override
   Future<void> close() {
-      print('closing streamlistener');
+    print('closing streamlistener');
     _messagesStream?.cancel();
     return super.close();
   }

@@ -11,22 +11,26 @@ class Repository {
 
   static const collection = 'PingMeChats';
 
-  Future<void> sendMessage(Message message, String receiverId) async {
+  Future<void> sendMessage(Message message, String conversationId) async {
     await _firestore
         .collection(collection)
-        .doc('${message.userId}-$receiverId')
+        .doc('$conversationId')
         .collection('chats')
         .add({
-      'createdAt': Timestamp.now(),
+      'text': message.text,
+      'createdAt': message.createdAt.toString(),
       'userId': message.userId,
       'userName': message.userName,
       'userImage': message.userImage,
     });
   }
 
-  Stream<List<Message>> receiveMessage() {
+  Stream<List<Message>> receiveMessage(String conversationId) {
     return _firestore
-        .collection(collection).snapshots()
+        .collection(collection)
+        .doc('$conversationId')
+        .collection('chats').orderBy('createdAt')
+        .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((documentSnapshot) {
         print('extracted data is : ${documentSnapshot.data()}');
@@ -38,9 +42,31 @@ class Repository {
   deleteMessage(Message message, String receiverId, String docId) {
     _firestore
         .collection(collection)
-        .doc('${message.userId}-$receiverId')
+        .doc('${message.userId}$receiverId')
         .collection('chats')
         .doc(docId)
         .delete();
+  }
+
+  Future<List<Map<String, String>>> retrieveConversationsContacts(String userId) async {
+    List<Map<String, String>> conversationIds = [];
+    QuerySnapshot querySnapshot = await _firestore.collection(collection).get();
+    querySnapshot.docs.forEach((element) {
+      if (element.id.contains(userId)) {
+        conversationIds.add({
+          'receiver': element.id
+              .split(userId)
+              .firstWhere((element) => element.isNotEmpty),
+          'conversation': element.id
+        });
+      }
+    });
+
+    if (conversationIds.isEmpty) {
+      return null;
+    } else {
+      print(conversationIds);
+      return conversationIds;
+    }
   }
 }
