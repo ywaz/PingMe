@@ -4,9 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'package:pingMe/bloc/simple_bloc_observer.dart';
+import 'package:pingMe/repository/authentication_repository.dart';
 import 'package:pingMe/repository/repository.dart';
 import 'package:flutter/foundation.dart';
-import 'package:pingMe/screens/conversationsScreen.dart';
+import 'package:pingMe/screens/conversations_screen.dart';
+import 'package:pingMe/screens/login_screen.dart';
 import 'repository/repository.dart';
 
 void main() async {
@@ -17,8 +19,11 @@ void main() async {
   final firestore = FirebaseFirestore.instance;
 
   runApp(
-    RepositoryProvider(
-      create: (_) => Repository(firestore: firestore),
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (_) => Repository(firestore: firestore)),
+        RepositoryProvider(create: (_)=> AuthenticationRepository(null))
+      ],
       child: const PingMe(),
     ),
   );
@@ -37,7 +42,7 @@ class PingMe extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ConversationsScreen(),
+      home: LoginScreen(),
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pingMe/repository/repository.dart';
-import 'package:pingMe/screens/MessagesScreen.dart';
+import 'package:pingMe/screens/messages_screen.dart';
 
 class ConversationsScreen extends StatelessWidget {
   @override
