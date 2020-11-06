@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:pingMe/bloc/bloc.dart';
 import 'package:pingMe/bloc/message_events.dart';
+import 'package:pingMe/repository/authentication_repository.dart';
 import 'package:pingMe/repository/message.dart';
 import 'package:pingMe/bloc/message_states.dart';
 import 'package:pingMe/repository/repository.dart';
@@ -15,7 +16,6 @@ class MessagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Bloc  Provider Builder ');
     return BlocProvider<MessageBloc>(
       create: (ctx) => MessageBloc(
         repository: ctx.repository<Repository>(),
@@ -56,7 +56,7 @@ class _MessagesState extends State<Messages> {
             child: (state is MessageLoaded)
                 ? ListView.builder(
                     itemCount: state.listMessages.length,
-                    itemBuilder: (context, index) => MessageBubble(userId: '123456789', message: state.listMessages[index]),
+                    itemBuilder: (context, index) => MessageBubble(userId: context.repository<AuthenticationRepository>().currentUser.userId , message: state.listMessages[index]),
                   )
                 : Center(child: CircularProgressIndicator()),
           ),
@@ -83,7 +83,7 @@ class _MessagesState extends State<Messages> {
                         BlocProvider.of<MessageBloc>(context).add(SendMessage(
                             message: Message(
                                 text: _textController.text,
-                                userId: '123456789',
+                                userId: context.repository<AuthenticationRepository>().currentUser.userId,
                                 userName: 'toto',
                                 createdAt: DateTime.now()),
                             conversationId: widget.conversationId));

@@ -14,7 +14,7 @@ class AuthenticationState extends Equatable{
 class Authenticated extends AuthenticationState{
 
   final userModel.User user;
-  Authenticated(this.user):assert(user!=null && user!=userModel.User.empty), super([user]);
+  Authenticated(this.user):assert(user!=null), super([user]);
 
 }
 

@@ -49,10 +49,13 @@ class Repository {
   }
 
   Future<List<Map<String, String>>> retrieveConversationsContacts(String userId) async {
+   
     List<Map<String, String>> conversationIds = [];
     QuerySnapshot querySnapshot = await _firestore.collection(collection).get();
     querySnapshot.docs.forEach((element) {
+      
       if (element.id.contains(userId)) {
+        print(element.id);
         conversationIds.add({
           'receiver': element.id
               .split(userId)
@@ -62,11 +65,8 @@ class Repository {
       }
     });
 
-    if (conversationIds.isEmpty) {
-      return null;
-    } else {
       print(conversationIds);
       return conversationIds;
-    }
+    
   }
 }

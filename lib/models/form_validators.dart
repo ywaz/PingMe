@@ -8,7 +8,7 @@
   }
 
   bool passwordvalidator(String pwd){
-    RegExp regex= RegExp(r'^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])){8,}'); 
+    RegExp regex= RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{8,}'); 
     if(pwd.isNotEmpty){
       return regex.hasMatch(pwd);
     }

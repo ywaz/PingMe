@@ -9,7 +9,7 @@ class User extends Equatable {
       @required this.userName,
       @required this.userEmail,
       this.userImageUrl})
-      : assert(userId != null && userName != null && userEmail != null);
+      : assert(userId != null && userEmail != null);
 
   // It's useful to define a static empty User so that we don't have to handle null Users and can always work with a concrete User object.
   static const empty = User(userEmail: '', userId: '', userName: '', userImageUrl: '');

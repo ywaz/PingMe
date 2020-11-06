@@ -11,12 +11,13 @@ class LogOutFailure implements Exception {}
 
 class AuthenticationRepository {
   final FirebaseAuth _auth;
-  AuthenticationRepository(FirebaseAuth userAuth)
+  AuthenticationRepository({FirebaseAuth userAuth})
       : _auth = userAuth ??
             FirebaseAuth
                 .instance; //initialize _auth if userAuth is not specified at class instanciation
 
   Stream<userModel.User> get user {
+    
     return _auth.userChanges().map((firebaseUser) {
       return firebaseUser == null
           ? userModel.User.empty
@@ -26,6 +27,15 @@ class AuthenticationRepository {
               userName: firebaseUser.displayName?? null,
               userImageUrl: firebaseUser.photoURL?? null);
     });
+  }
+
+  userModel.User get currentUser {
+    return userModel.User(
+      userId: _auth.currentUser.uid,
+      userEmail: _auth.currentUser.email,
+      userName: 'notYetHandled',
+      userImageUrl: null,
+      );
   }
 
   Future<void> signUp(
@@ -45,7 +55,11 @@ class AuthenticationRepository {
       {@required String email, @required String pwd}) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: pwd);
-    } on Exception {
+      
+    }on FirebaseAuthException catch(e){
+      print(e);
+    } 
+    on Exception {
       throw SignInFailure();
     }
   }

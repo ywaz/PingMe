@@ -13,18 +13,17 @@ class LoginCubit extends Cubit<LoginState> {
         super(LoginState());
 
   void emailChanged(String email) {
-    print('validating email value');
     if (!formValidators.emailValidator(email)) {
       emit(EmailNeeded());
-    }else{
+    } else {
       emit(ValidInput());
     }
   }
 
   void passwordChanged(String password) {
-    if (!formValidators.emailValidator(password)) {
+    if (!formValidators.passwordvalidator(password)) {
       emit(PWDNeeded());
-    }else{
+    } else {
       emit(ValidInput());
     }
   }

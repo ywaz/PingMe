@@ -10,6 +10,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextEditingController _emailController = TextEditingController();
     final TextEditingController _pwdController = TextEditingController();
+    final size = MediaQuery.of(context).size;
 
     return BlocProvider(
       create: (context) =>
@@ -28,57 +29,61 @@ class LoginScreen extends StatelessWidget {
 
             return Align(
               alignment: Alignment.center,
-              child: ListView(
-                scrollDirection: Axis.vertical,
-                children: [
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'Email@',
-                      errorText:
-                          (state is EmailNeeded) ? 'Invalid Email' : null,
-                    ),
-                    textInputAction: TextInputAction.next,
-                    onChanged: (value) {
+              child: Container(
+                padding: EdgeInsets.only(top: size.height/5),
+                width: size.width*5/7,
+                child: ListView(
+                  scrollDirection: Axis.vertical,
+                  children: [
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: 'Email@',
+                        errorText:
+                            (state is EmailNeeded) ? 'Invalid Email' : null,
+                      ),
+                      textInputAction: TextInputAction.next,
+                      onChanged: (value) {
+                        
+                        context.bloc<LoginCubit>().emailChanged(value);
+                      },
                       
-                      context.bloc<LoginCubit>().emailChanged(value);
-                    },
-                    
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  TextFormField(
-                    controller: _pwdController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      errorText:
-                          state == PWDNeeded() ? 'Invalid Password' : null,
                     ),
-                    textInputAction: TextInputAction.next,
-                    onChanged: (value) {
-                      context.bloc<LoginCubit>().passwordChanged(value);
-                    },
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  (state is LoginRequested)
-                      ? Center(child: CircularProgressIndicator())
-                      : FlatButton(
-                          onPressed: () {
-                            if (_emailController.text.isNotEmpty &&
-                                _pwdController.text.isNotEmpty) {
-                              context.bloc<LoginCubit>().signInWithEmail(
-                                  _emailController.text.trim(),
-                                  _pwdController.text);
-                            }
-                          },
-                          child: Text('Login'),
-                        )
-                ],
+                    SizedBox(
+                      height: 5,
+                    ),
+                    TextFormField(
+                      controller: _pwdController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        errorText:
+                            state == PWDNeeded() ? 'Invalid Password' : null,
+                      ),
+                      textInputAction: TextInputAction.next,
+                      onChanged: (value) {
+                        context.bloc<LoginCubit>().passwordChanged(value);
+                      },
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    (state is LoginRequested)
+                        ? Center(child: CircularProgressIndicator())
+                        : FlatButton(
+                            onPressed: () {
+                              if (_emailController.text.isNotEmpty &&
+                                  _pwdController.text.isNotEmpty) {
+                                context.bloc<LoginCubit>().signInWithEmail(
+                                    _emailController.text,
+                                    _pwdController.text);
+                              }
+                            },
+                            child: Text('Login'),
+                          )
+                  ],
+                ),
               ),
             );
           },

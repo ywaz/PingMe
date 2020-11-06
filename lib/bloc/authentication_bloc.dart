@@ -15,6 +15,7 @@ class AuthBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
         this._authenticationRepository = authenticationRepository,
         super(UnAuthenticated()) {
     _userSubscription = _authenticationRepository.user.listen((user) {
+  
       add(AuthUserChanged(user));
     });
   }
@@ -24,13 +25,14 @@ class AuthBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
       AuthenticationEvent event) async* {
     if (event is UnAuthenticated) {
       yield UnAuthenticated();
-    } else if (event is AuthUserChanged) {
+    } else if (event is AuthUserChanged && event.user!=userModel.User.empty) {
       //maybe add check on empty user here
       yield Authenticated(event.user);
     } else if (event is AuthLogOut){
       _authenticationRepository.logOut();
+      yield(UnAuthenticated());
     }
-
+ 
   }
 
   @override

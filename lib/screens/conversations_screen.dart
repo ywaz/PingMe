@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pingMe/bloc/authentication_bloc.dart';
+import 'package:pingMe/bloc/authentication_events.dart';
 import 'package:pingMe/repository/repository.dart';
 import 'package:pingMe/screens/messages_screen.dart';
+import 'package:pingMe/repository/user.dart' as userModel;
 
 class ConversationsScreen extends StatelessWidget {
+  static const String routeName='ConversationsScreen';
+  final userModel.User user;
+
+  ConversationsScreen(this.user):assert(user!=null);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [IconButton(icon: Icon(Icons.exit_to_app),  onPressed: ()=>context.bloc<AuthBloc>()..add(AuthLogOut()))],
+      ),
       body: FutureBuilder(
         future: RepositoryProvider.of<Repository>(context)
-            .retrieveConversationsContacts('123456789'),
+            .retrieveConversationsContacts(user.userId),
         builder: (context, conversationsList) {
           return conversationsList.connectionState == ConnectionState.done
               ? ListView.builder(
