@@ -11,6 +11,7 @@ import 'package:pingMe/repository/repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pingMe/screens/conversations_screen.dart';
 import 'package:pingMe/screens/login_screen.dart';
+import 'package:pingMe/screens/signup_screen.dart';
 import 'repository/repository.dart';
 import 'package:pingMe/screens/splash_screen.dart';
 
@@ -44,10 +45,10 @@ class PingMe extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // routes: {
-      //   '/': (ctx)=> LoginScreen(),
-      //   ConversationsScreen.routeName: (ctx)=> ConversationsScreen(),
-      // },
+      routes: {
+        LoginScreen.route: (ctx)=> LoginScreen(),
+        SignUpScreen.route: (ctx)=>SignUpScreen(),
+      },
       home: BlocProvider<AuthBloc>(
         create: (ctx) => AuthBloc(ctx.repository<AuthenticationRepository>()),
         child:
@@ -55,7 +56,6 @@ class PingMe extends StatelessWidget {
           if (state is UnAuthenticated) {
             return LoginScreen();
           } else if (state is Authenticated) {
-            print('main widget the current user is : ${state.user.userId}');
             return ConversationsScreen(state.user);
           } else {
             return SplashScreen();

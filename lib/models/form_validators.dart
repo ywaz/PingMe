@@ -1,3 +1,4 @@
+  enum FormStatus{invalidEmail, invalidUserName, invalidPwd, emptyInput, validEmail, validuserName, validPwd, validPwdConfirmation,notMatching,pure, signUpRequested, signUpSuccesfull, signUpFailure}
 
   bool emailValidator(String email){
     RegExp regex = RegExp(r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$');

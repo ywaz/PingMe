@@ -69,4 +69,8 @@ class Repository {
       return conversationIds;
     
   }
+
+  static  registerUser(String email, String uID, String userName){
+    
+  }
 }

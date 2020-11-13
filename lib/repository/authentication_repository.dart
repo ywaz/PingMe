@@ -11,6 +11,9 @@ class LogOutFailure implements Exception {}
 
 class AuthenticationRepository {
   final FirebaseAuth _auth;
+  // final FirebaseFirestore _firestore;
+  // , _firestore=firestore?? FirebaseFirestore.instance
+  // , FirebaseFirestore firestore
   AuthenticationRepository({FirebaseAuth userAuth})
       : _auth = userAuth ??
             FirebaseAuth
@@ -46,7 +49,8 @@ class AuthenticationRepository {
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: pwd);
       await userCredential.user.updateProfile(displayName: userName);
-    } on Exception {
+    } on Exception catch(e){
+      print(e);
       throw SignUpFailure();
     }
   }
@@ -63,6 +67,8 @@ class AuthenticationRepository {
       throw SignInFailure();
     }
   }
+
+
 
   Future<void> logOut() async {
     try {
