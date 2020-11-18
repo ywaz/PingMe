@@ -16,15 +16,20 @@ class ConversationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: RichText(text: TextSpan(
-          children: <TextSpan>[
-            TextSpan(text:'Welcome', style: TextStyle(fontStyle: FontStyle.italic, fontSize: 18)),
-            TextSpan(text: ' ${user.userName}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20 ))
-          ]
-        )),
+        title: RichText(
+            text: TextSpan(children: <TextSpan>[
+          TextSpan(
+              text: 'Welcome',
+              style: TextStyle(fontStyle: FontStyle.italic, fontSize: 18)),
+          TextSpan(
+              text: ' ${user.userName}',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))
+        ])),
         actions: [
           IconButton(
-              icon: Icon(Icons.exit_to_app,),
+              icon: Icon(
+                Icons.exit_to_app,
+              ),
               onPressed: () => context.bloc<AuthBloc>()..add(AuthLogOut()))
         ],
       ),
@@ -49,10 +54,12 @@ class ConversationsScreen extends StatelessWidget {
                         child: ListTile(
                           leading: Icon(Icons.person),
                           title:
-                              Text(conversationsList.data[index]['receiver']),
+                              Text(conversationsList.data[index]['receiverName']),
                           onTap: () => Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
                             return MessagesScreen(
+                              receiverName: conversationsList.data[index]
+                                  ['receiverName'],
                               conversationId: conversationsList.data[index]
                                   ['conversation'],
                             );

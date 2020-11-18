@@ -34,6 +34,7 @@ class LoginCubit extends Cubit<LoginState> {
       await _authenticationRepository.signInwithEmail(email: email, pwd: pwd);
       emit(LoginSuccesfull());
     } on Exception {
+      
       emit(LoginFailure());
     }
   }

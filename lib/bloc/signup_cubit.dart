@@ -59,6 +59,7 @@ class SignUPCubit extends Cubit<SignUpState> {
       await _authenticationRepository.signUp(
           email: email, pwd: pwd, userName: userName);
       emit(state.copyWith(status: formz.FormStatus.signUpSuccesfull));
+      await _authenticationRepository.addNewwUserToDB();
     } on Exception {
       print('signup failure occured');
       emit(state.copyWith(status: formz.FormStatus.signUpFailure));

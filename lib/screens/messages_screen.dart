@@ -11,7 +11,8 @@ import 'package:pingMe/widgets/message_bubble.dart';
 
 class MessagesScreen extends StatelessWidget {
   final String conversationId;
-  const MessagesScreen({Key key, @required this.conversationId})
+  final String receiverName;
+  const MessagesScreen({Key key, @required this.conversationId, @required this.receiverName})
       : super(key: key);
 
   @override
@@ -20,14 +21,15 @@ class MessagesScreen extends StatelessWidget {
       create: (ctx) => MessageBloc(
         repository: ctx.repository<Repository>(),
       )..add(ReceiveMessage(conversationId: conversationId)),
-      child: Messages(conversationId: this.conversationId),
+      child: Messages(conversationId: this.conversationId, receiverName: this.receiverName,),
     );
   }
 }
 
 class Messages extends StatefulWidget {
   final String conversationId;
-  const Messages({Key key, @required this.conversationId}) : super(key: key);
+  final String receiverName;
+  const Messages({Key key, @required this.conversationId, @required this.receiverName}) : super(key: key);
 
   @override
   _MessagesState createState() => _MessagesState();
@@ -46,7 +48,7 @@ class _MessagesState extends State<Messages> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('PingMe'),
+        title: Text(widget.receiverName),
       ),
       body: BlocBuilder<MessageBloc, MessageState>(
           builder: (context, MessageState state) {
@@ -56,7 +58,7 @@ class _MessagesState extends State<Messages> {
             child: (state is MessageLoaded)
                 ? ListView.builder(
                     itemCount: state.listMessages.length,
-                    itemBuilder: (context, index) => MessageBubble(userId: context.repository<AuthenticationRepository>().currentUser.userId , message: state.listMessages[index]),
+                    itemBuilder: (context, index) => MessageBubble(message: state.listMessages[index]),
                   )
                 : Center(child: CircularProgressIndicator()),
           ),

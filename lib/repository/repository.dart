@@ -29,7 +29,8 @@ class Repository {
     return _firestore
         .collection(collection)
         .doc('$conversationId')
-        .collection('chats').orderBy('createdAt')
+        .collection('chats')
+        .orderBy('createdAt')
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((documentSnapshot) {
@@ -48,29 +49,46 @@ class Repository {
         .delete();
   }
 
-  Future<List<Map<String, String>>> retrieveConversationsContacts(String userId) async {
-   
+  Future<String> getUserfromDB(String userId) async {
+    DocumentSnapshot documentSS =
+        await _firestore.collection('PingMeUsers').doc(userId).get();
+
+    if (documentSS.data()['email'] != null) {
+      return documentSS.data()['email'];
+    }
+    return 'Unknown';
+  }
+
+  Future<List<Map<String, Object>>> retrieveConversationsContacts(
+      String userId) async {
+    print('retrieve conversations started...');
     List<Map<String, String>> conversationIds = [];
+
     QuerySnapshot querySnapshot = await _firestore.collection(collection).get();
     querySnapshot.docs.forEach((element) {
-      
       if (element.id.contains(userId)) {
-        print(element.id);
-        conversationIds.add({
-          'receiver': element.id
-              .split(userId)
-              .firstWhere((element) => element.isNotEmpty),
-          'conversation': element.id
-        });
+        String receiverId = element.id.trim()
+            .split(userId)
+            .firstWhere((element) => element.isNotEmpty);
+
+       conversationIds
+            .add({'receiver': receiverId, 'conversation': element.id});
       }
     });
 
-      print(conversationIds);
-      return conversationIds;
-    
+    for (Map<String, String> i in conversationIds) {
+      print('toto:  ${i['receiver']}');
+      DocumentSnapshot temp =
+          await _firestore.collection('PingMeUsers').doc(i['receiver']).get();
+          if(temp.exists){
+            i.addAll({'receiverName': temp.data()['userName']});
+
+          }
+      
+    }
+
+    return conversationIds;
   }
 
-  static  registerUser(String email, String uID, String userName){
-    
-  }
+  static registerUser(String email, String uID, String userName) {}
 }

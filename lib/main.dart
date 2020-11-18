@@ -26,7 +26,7 @@ void main() async {
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider(create: (_) => Repository(firestore: firestore)),
-        RepositoryProvider(create: (_) => AuthenticationRepository())
+        RepositoryProvider(create: (_) => AuthenticationRepository(firestore: firestore))
       ],
       child: const PingMe(),
     ),
